@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # service Php
+  php:
+    build: './php_docker/'
+    volumes:
+      - ./www/:/var/www/html
+    container_name: PHP
+
+  # service Apache
+  apache:
+    build: './apache_docker/'
+    depends_on:
+      - php
+    ports:
+      - '8090:80'
+    volumes:
+      - ./www/:/var/www/html
+    container_name: APACHE
+  
+  # service MariaDB
+  db:
+    image: mariadb:11.2
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 3310:3306
+    volumes:
+      - bibliodatabase:/var/lib/mysql
+    container_name: MariaDB
+
+  # service PhpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    ports:
+      - 8020:80
+    # environment:
+    #   - PMA_ARBITRARY=1
+    depends_on:
+      - db
+    container_name: PhpMyAdmin
+
+volumes:
+  bibliodatabase: 
